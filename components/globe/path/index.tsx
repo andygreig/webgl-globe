@@ -1,36 +1,33 @@
+import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
-
-import { ArcCurve } from "@/lib/utils/classes/arc.class";
-import { latLongToVector3 } from "@/lib/utils/map";
-
+import { PathCurve } from "@/lib/utils/classes/path.class";
 import { TargetMarker } from "../target-marker";
+import { latLongToVector3 } from "@/lib/utils/map";
 import { AnimatedPath } from "@/lib/types";
 
-interface ArcProps extends AnimatedPath {
-  start: [number, number];
-  end: [number, number];
-  arcHeightFactor?: number;
-  arcHeightOffset?: number;
+interface PathProps extends AnimatedPath {
+  points: number[][]; // Array of [lat, lon] coordinates
+  smoothness?: number;
+  pathColor?: number;
+  pathWidth?: number;
 }
 
-const Arc = ({
-  start,
-  end,
+const Path = ({
+  points,
   radius = 20,
-  arcHeightFactor = 0.3,
-  arcHeightOffset = 0,
+  smoothness = 0.3,
+  pathColor = 0x2196f3,
   pathWidth = 0.03,
-  pathColor = 0x84b845,
   revealDuration = 2500,
   hideDuration = 2500,
   pauseDuration = 500,
   markerSize = 0.2,
   markerColor = 0x125291,
   markerOffset = -0.1,
-}: ArcProps) => {
-  const tubeRef = useRef<THREE.BufferGeometry | null>(null);
+}: PathProps) => {
+  // Ref for tube geometry
+  const tubeRef = useRef<THREE.BufferGeometry>(null);
   const startTime = useRef<number | null>(null);
 
   // State to manage animation stages
@@ -38,19 +35,24 @@ const Arc = ({
     "reveal" | "pause" | "hide"
   >("reveal");
 
-  const arcPath = animationStage === "hide" ? [end, start] : [start, end];
-  const startMarkerPosition = latLongToVector3(start[0], start[1], radius);
-  const endMarkerPosition = latLongToVector3(end[0], end[1], radius);
+  const directedPoints = animationStage === "hide" ? points.reverse() : points;
 
-  const arcCurve = useMemo(() => {
-    return new ArcCurve(
-      arcPath[0],
-      arcPath[1],
-      radius,
-      arcHeightFactor,
-      arcHeightOffset
-    );
-  }, [start, end, animationStage]);
+  const startPostition = points[0];
+  const endPostition = points[points.length - 1];
+  const startMarkerPosition = latLongToVector3(
+    startPostition[0],
+    startPostition[1],
+    radius
+  );
+  const endMarkerPosition = latLongToVector3(
+    endPostition[0],
+    endPostition[1],
+    radius
+  );
+
+  const pathCurve = useMemo(() => {
+    return new PathCurve(directedPoints, radius, smoothness);
+  }, [directedPoints, radius, smoothness, animationStage]);
 
   useFrame(({ clock }) => {
     if (!startTime.current) {
@@ -77,7 +79,6 @@ const Arc = ({
             startTime.current = clock.getElapsedTime();
             setAnimationStage("pause");
           }
-
           break;
 
         case "pause":
@@ -108,9 +109,15 @@ const Arc = ({
       <mesh>
         <tubeGeometry
           ref={tubeRef}
-          args={[arcCurve, 44, pathWidth, 4, false]}
+          args={[
+            pathCurve,
+            points.length * 10, // increased point density
+            pathWidth,
+            4, // radial segments
+            false, // not closed
+          ]}
         />
-        <meshStandardMaterial color={pathColor} />
+        <meshStandardMaterial color={pathColor} side={THREE.DoubleSide} />
       </mesh>
       <TargetMarker
         position={startMarkerPosition}
@@ -130,4 +137,4 @@ const Arc = ({
   );
 };
 
-export { Arc };
+export { Path };

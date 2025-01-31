@@ -1,9 +1,10 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 
-import { Globe } from "../globe";
+import { RotatingGlobe } from "../rotating-globe";
+import { routes as oceanRoutes } from "./ocean-animations";
+import { routes as airRoutes } from "./air-animations";
 
 const Scene = () => {
   return (
@@ -15,29 +16,19 @@ const Scene = () => {
       }}
     >
       <Canvas
+        gl={{ antialias: false }}
         camera={{
-          fov: 30,
+          fov: 45,
           near: 1,
-          far: 1000,
+          far: 500,
           zoom: 1,
-          position: [0, 0, 100],
+          position: [0, 0, 65],
         }}
       >
-        <Globe position={[0, 0, 0]} />
-        <ambientLight intensity={Math.PI} />
-        <hemisphereLight
-          color={0xffffbb}
-          groundColor={0x080820}
-          intensity={1.5}
+        <RotatingGlobe
+          routes={[airRoutes, oceanRoutes]}
+          rotationSpeed={0.0012}
         />
-        <pointLight
-          position={[-50, 0, 60]}
-          decay={0}
-          intensity={Math.PI}
-          distance={100}
-          color={0x081b26}
-        />
-        <OrbitControls enableDamping dampingFactor={0.1} rotateSpeed={0.5} />
       </Canvas>
     </div>
   );

@@ -175,7 +175,7 @@ const Dots = ({ dotSphereRadius, dotDensity = 2.5 }: DotsProps) => {
   }, [dots]);
 
   // Animate time uniform
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (materialRef.current) {
       materialRef.current.uniforms.time.value = state.clock.elapsedTime;
     }
@@ -189,7 +189,7 @@ const Dots = ({ dotSphereRadius, dotDensity = 2.5 }: DotsProps) => {
       ref={meshRef}
       args={[undefined, undefined, dots.length]} // Geometry, Material, Count
     >
-      <sphereGeometry args={[0.1, 4, 4]} />
+      <sphereGeometry args={[0.06, 4, 4]} />
       <shaderMaterial
         ref={materialRef}
         vertexShader={vertexShader}

@@ -1,64 +1,45 @@
 "use client";
 
 import * as THREE from "three";
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import { Mesh } from "three";
+import { Group } from "three";
 
+import { GlobeRouteAnimation } from "@/lib/types";
 import { Dots } from "./dots";
-import { Arc } from "./arc";
+import { AnimationGroup } from "./animation-group";
+import { forwardRef } from "react";
 // import { DotsAlt } from "./dots-alt";
 
 interface GlobeProps {
   position: [x: number, y: number, z: number];
+  routes: GlobeRouteAnimation[][];
+  sphereSize?: number;
+  dotDensity?: number;
+  tilt?: number;
 }
 
-const SPHERE_SIZE = 19;
+const Globe = forwardRef<Group, GlobeProps>(
+  ({ position, routes, sphereSize = 19, dotDensity = 3, tilt = 0.55 }, ref) => {
+    return (
+      <group ref={ref} position={position} rotation={[tilt, 0, 0]}>
+        <mesh>
+          <sphereGeometry args={[sphereSize, 35, 35]} />
+          <meshStandardMaterial
+            color={0x0b2636}
+            transparent={true}
+            opacity={0.9}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+        {routes.map((route, i) => (
+          <AnimationGroup key={i} routes={route} sphereSize={sphereSize} />
+        ))}
+        <Dots dotSphereRadius={sphereSize + 0.1} dotDensity={dotDensity} />
+      </group>
+    );
+  }
+);
 
-const Globe = ({ position }: GlobeProps) => {
-  // This reference gives us direct access to the THREE.Mesh object
-  const ref = useRef<Mesh>(undefined);
-
-  // Subscribe this component to the render-loop, rotate the mesh every frame
-  useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.x += delta;
-    }
-  });
-
-  return (
-    <>
-      <mesh position={position} ref={ref}>
-        <sphereGeometry args={[SPHERE_SIZE, 35, 35]} />
-        <meshStandardMaterial
-          color={0x0b2636}
-          transparent={true}
-          opacity={0.7}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-      {/* <DotsAlt /> */}
-      <Arc
-        start={[40.7128, -74.006]}
-        end={[35.6762, 139.6503]}
-        radius={SPHERE_SIZE}
-        arcHeightFactor={0.25}
-      />
-      <Arc
-        start={[-37.8136, 144.963]}
-        end={[1.352, 103.819]}
-        radius={SPHERE_SIZE}
-        arcHeightFactor={0.25}
-      />
-      <Arc
-        start={[-37.8136, 144.963]}
-        end={[25.204, 55.27]}
-        radius={SPHERE_SIZE}
-        arcHeightFactor={0.25}
-      />
-      <Dots dotSphereRadius={19.1} dotDensity={2.2} />
-    </>
-  );
-};
+// Add a display name for better debugging
+Globe.displayName = "Globe";
 
 export { Globe };
