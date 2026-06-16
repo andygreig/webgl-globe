@@ -4,6 +4,9 @@ An interactive 3D globe built with React Three Fiber and Next.js. It renders lan
 
 <video src="https://github.com/user-attachments/assets/aa4e0dff-ff2c-490e-ad71-8de55f0f0cd1" autoplay loop muted playsinline width="100%"></video>
 
+## Demo
+[https://globe-andy-greig.vercel.app/](https://globe-andy-greig.vercel.app/)
+
 ## Features
 
 - **Dot-rendered land masses** — land areas are drawn as thousands of individually twinkling point instances, derived from a world map image
