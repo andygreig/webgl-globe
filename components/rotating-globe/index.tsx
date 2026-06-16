@@ -4,28 +4,58 @@ import { Group } from "three";
 import { OrbitControls } from "@react-three/drei";
 import { Globe } from "../globe";
 import { GlobeRouteAnimation } from "@/lib/types";
+import { GLOBE_DEFAULTS } from "@/lib/config";
 
 interface RotatingGlobeProps {
   routes: GlobeRouteAnimation[][];
   rotationSpeed?: number;
+  paused?: boolean;
+  tilt?: number;
+  sphereColor?: string;
+  dotDensity?: number;
+  dotColor?: string;
+  twinkleStrength?: number;
+  arcColor?: string;
+  pathColor?: string;
+  animationSpeed?: number;
 }
 
-// Create a separate component for the rotating globe
 const RotatingGlobe = ({
   routes,
-  rotationSpeed = 0.002,
+  rotationSpeed = GLOBE_DEFAULTS.rotationSpeed,
+  paused = false,
+  tilt = GLOBE_DEFAULTS.tilt,
+  sphereColor = GLOBE_DEFAULTS.sphereColor,
+  dotDensity = GLOBE_DEFAULTS.dotDensity,
+  dotColor = GLOBE_DEFAULTS.dotColor,
+  twinkleStrength = GLOBE_DEFAULTS.twinkleStrength,
+  arcColor = GLOBE_DEFAULTS.arcColor,
+  pathColor = GLOBE_DEFAULTS.pathColor,
+  animationSpeed = GLOBE_DEFAULTS.animationSpeed,
 }: RotatingGlobeProps) => {
   const globeRef = useRef<Group>(null);
 
   useFrame(() => {
-    if (globeRef.current) {
+    if (globeRef.current && !paused) {
       globeRef.current.rotation.y -= rotationSpeed;
     }
   });
 
   return (
     <>
-      <Globe ref={globeRef} position={[0, 0, 0]} routes={routes} tilt={0.3} />
+      <Globe
+        ref={globeRef}
+        position={[0, 0, 0]}
+        routes={routes}
+        tilt={tilt}
+        sphereColor={sphereColor}
+        dotDensity={dotDensity}
+        dotColor={dotColor}
+        twinkleStrength={twinkleStrength}
+        arcColor={arcColor}
+        pathColor={pathColor}
+        animationSpeed={animationSpeed}
+      />
       <ambientLight intensity={Math.PI} />
       <hemisphereLight
         color={0xffffbb}

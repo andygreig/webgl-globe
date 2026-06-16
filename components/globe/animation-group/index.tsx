@@ -3,13 +3,23 @@ import { Arc } from "../arc";
 import { useEffect, useRef, useState } from "react";
 import { Path } from "../path";
 import { useFrame } from "@react-three/fiber";
+import { GLOBE_DEFAULTS } from "@/lib/config";
 
 interface AnimationGroupProps {
   sphereSize: number;
   routes: GlobeRouteAnimation[];
+  arcColor?: string;
+  pathColor?: string;
+  animationSpeed?: number;
 }
 
-const AnimationGroup = ({ routes, sphereSize }: AnimationGroupProps) => {
+const AnimationGroup = ({
+  routes,
+  sphereSize,
+  arcColor = GLOBE_DEFAULTS.arcColor,
+  pathColor = GLOBE_DEFAULTS.pathColor,
+  animationSpeed = GLOBE_DEFAULTS.animationSpeed,
+}: AnimationGroupProps) => {
   const [activeAnimations, setActiveAnimations] = useState<number[]>([]);
   const [animationStartTime, setAnimationStartTime] = useState<number>(0);
   const activeAnimationsRef = useRef<number[]>([]);
@@ -22,7 +32,7 @@ const AnimationGroup = ({ routes, sphereSize }: AnimationGroupProps) => {
   }, []);
 
   useFrame(() => {
-    const elapsedTime = Date.now() - animationStartTime;
+    const elapsedTime = (Date.now() - animationStartTime) * animationSpeed;
 
     if (elapsedTime >= TOTAL_CYCLE_DURATION) {
       setAnimationStartTime(Date.now());
@@ -51,9 +61,10 @@ const AnimationGroup = ({ routes, sphereSize }: AnimationGroupProps) => {
 
   return routes.map((route) => {
     if (!activeAnimations.includes(route.id)) return null;
-    const pauseDuration = 500;
-    const durationMinusDelay = route.duration - pauseDuration;
-    const pathDuration = durationMinusDelay / 2;
+
+    const pauseDuration = 500 / animationSpeed;
+    const durationMinusDelay = route.duration - pauseDuration * animationSpeed;
+    const pathDuration = durationMinusDelay / 2 / animationSpeed;
 
     if (route.type === "arc") {
       const [start, end] = route.path;
@@ -66,19 +77,24 @@ const AnimationGroup = ({ routes, sphereSize }: AnimationGroupProps) => {
           revealDuration={pathDuration}
           hideDuration={pathDuration}
           pauseDuration={pauseDuration}
+          pathColor={route.color ?? arcColor}
+          pathWidth={route.pathWidth}
         />
       );
     }
+
     if (route.type === "path") {
       return (
         <Path
           key={route.id}
           points={route.path}
-          smoothness={0.3} // Adjust smoothness (0-1)
+          smoothness={0.3}
           radius={sphereSize}
           revealDuration={pathDuration}
           hideDuration={pathDuration}
           pauseDuration={pauseDuration}
+          pathColor={route.color ?? pathColor}
+          pathWidth={route.pathWidth}
         />
       );
     }

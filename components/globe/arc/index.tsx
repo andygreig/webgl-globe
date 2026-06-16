@@ -7,6 +7,7 @@ import { latLongToVector3 } from "@/lib/utils/map";
 
 import { TargetMarker } from "../target-marker";
 import { AnimatedPath } from "@/lib/types";
+import { GLOBE_DEFAULTS } from "@/lib/config";
 
 interface ArcProps extends AnimatedPath {
   start: [number, number];
@@ -22,12 +23,12 @@ const Arc = ({
   arcHeightFactor = 0.3,
   arcHeightOffset = 0,
   pathWidth = 0.03,
-  pathColor = 0x84b845,
+  pathColor = GLOBE_DEFAULTS.arcColor,
   revealDuration = 2500,
   hideDuration = 2500,
   pauseDuration = 500,
   markerSize = 0.2,
-  markerColor = 0x125291,
+  markerColor = GLOBE_DEFAULTS.markerColor,
   markerOffset = -0.1,
 }: ArcProps) => {
   const tubeRef = useRef<THREE.BufferGeometry | null>(null);

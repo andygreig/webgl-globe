@@ -8,20 +8,23 @@ export interface DotLatLon {
 
 export interface GlobeRouteAnimation {
   id: number;
-  type: string;
+  type: 'arc' | 'path';
   path: [number, number][];
   delay: number;
   duration: number;
+  label?: string;
+  color?: string;
+  pathWidth?: number;
 }
 
 export interface AnimatedPath {
   radius: number;
   pathWidth?: number;
-  pathColor?: number;
-  revealDuration?: number; // Animation duration for revealing
-  hideDuration?: number; // Animation duration for hiding
-  pauseDuration?: number; // Pause duration between reveal and hide
-  markerSize?: number; // Size of the start/end marker
-  markerColor?: number; // Color of the start/end marker
-  markerOffset?: number; // Position offset of the marker
+  pathColor?: string;
+  revealDuration?: number;
+  hideDuration?: number;
+  pauseDuration?: number;
+  markerSize?: number;
+  markerColor?: string;
+  markerOffset?: number;
 }

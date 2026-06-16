@@ -2,7 +2,7 @@
 
 An interactive 3D globe built with React Three Fiber and Next.js. It renders land masses as twinkling dots and animates trade routes as arcs and paths between cities around the world.
 
-![Globe Preview](public/world_alpha_mini.jpg)
+<video src="https://github.com/user-attachments/assets/aa4e0dff-ff2c-490e-ad71-8de55f0f0cd1" autoplay loop muted playsinline width="100%"></video>
 
 ## Features
 
@@ -39,10 +39,8 @@ app/
   globals.css       — background colour
 
 components/
-  scene/            — Canvas setup and route data
+  scene/            — Canvas setup and leva controls panel
     index.tsx       — R3F Canvas with camera config
-    air-animations.ts   — arc routes (flight paths)
-    ocean-animations.ts — path routes (shipping lanes)
 
   rotating-globe/   — auto-rotation + lighting + OrbitControls
   globe/            — main globe composition
@@ -51,8 +49,12 @@ components/
     arc/            — animated great-circle arc (reveal → pause → hide)
     path/           — animated multi-waypoint path (Catmull-Rom spline)
     dots/           — instanced twinkling land-mass dots (custom shader)
-    dots-alt/       — alternative dot implementation (Fibonacci sphere)
     target-marker/  — origin/destination ring marker
+
+data/
+  routes/
+    air.json        — arc routes (flight paths)
+    ocean.json      — path routes (shipping lanes)
 
 lib/
   types/            — shared TypeScript interfaces
@@ -69,7 +71,7 @@ public/
 
 ## Adding Routes
 
-Routes are defined in `components/scene/air-animations.ts` (arcs) and `components/scene/ocean-animations.ts` (paths). Each entry follows `GlobeRouteAnimation`:
+Routes are plain JSON arrays in `data/routes/air.json` (arcs) and `data/routes/ocean.json` (paths). Each entry follows `GlobeRouteAnimation`:
 
 ```ts
 interface GlobeRouteAnimation {
@@ -121,14 +123,22 @@ Each group cycles independently through its own timing sequence.
 
 ## Customisation
 
+All defaults live in [`lib/config.ts`](lib/config.ts) — that's the single file to edit when customising the globe's look and feel. They are also exposed as props and tweakable live via the built-in controls panel.
+
 | Prop | Component | Default | Effect |
 |------|-----------|---------|--------|
-| `rotationSpeed` | `RotatingGlobe` | `0.002` | Globe auto-rotation speed |
+| `rotationSpeed` | `RotatingGlobe` | `0.0012` | Globe auto-rotation speed |
+| `paused` | `RotatingGlobe` | `false` | Pause auto-rotation |
 | `sphereSize` | `Globe` | `19` | Radius of the sphere |
+| `sphereColor` | `Globe` | `#0b2636` | Globe sphere colour |
 | `dotDensity` | `Globe` | `3` | Dot density per degree of latitude |
-| `tilt` | `Globe` | `0.55` | Axial tilt in radians |
+| `dotColor` | `Globe` | `#519fcd` | Land dot colour |
+| `twinkleStrength` | `Globe` | `0.7` | Twinkle animation intensity |
+| `tilt` | `Globe` | `0.3` | Axial tilt in radians |
+| `arcColor` | `Globe` | `#84b845` | Default arc route colour |
+| `pathColor` | `Globe` | `#2196f3` | Default path route colour |
+| `animationSpeed` | `Globe` | `1` | Global animation speed multiplier |
 | `arcHeightFactor` | `Arc` | `0.3` | How high arcs fly above the surface |
-| `pathColor` | `Arc` / `Path` | `0x84b845` / `0x2196f3` | Route colour |
 | `pathWidth` | `Arc` / `Path` | `0.03` | Tube radius |
 
 ## How Land Detection Works

@@ -1,7 +1,7 @@
 "use client";
 
 import * as THREE from "three";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   calcPosFromLatLonRad,
@@ -11,8 +11,8 @@ import {
 import { DotLatLon } from "@/lib/types";
 import { loadImage } from "@/lib/utils/load-image";
 import { useFrame } from "@react-three/fiber";
+import { GLOBE_DEFAULTS } from "@/lib/config";
 
-// Custom shader for twinkle effect
 const vertexShader = `
 attribute float twinkleOffset;
 attribute float twinkleDuration;
@@ -26,7 +26,7 @@ void main() {
   vTwinkleOffset = twinkleOffset;
   vTwinkleDuration = twinkleDuration;
   vTwinkleIntensity = twinkleIntensity;
-  
+
   vec3 transformed = position;
   gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(transformed, 1.0);
 }
@@ -34,6 +34,9 @@ void main() {
 
 const fragmentShader = `
 uniform float time;
+uniform vec3 dotColor;
+uniform float twinkleStrength;
+
 varying float vTwinkleOffset;
 varying float vTwinkleDuration;
 varying float vTwinkleIntensity;
@@ -42,14 +45,16 @@ void main() {
   float twinkleTime = time + vTwinkleOffset;
   float twinkleCycle = mod(twinkleTime / vTwinkleDuration, 1.0);
   float twinkleAlpha = sin(twinkleCycle * 3.14159) * vTwinkleIntensity;
-  
-  gl_FragColor = vec4(0.082, 0.345, 0.608, 0.7 * (0.3 + twinkleAlpha));
+
+  gl_FragColor = vec4(dotColor, twinkleStrength * (0.3 + twinkleAlpha));
 }
 `;
 
 interface DotsProps {
   dotSphereRadius: number;
   dotDensity?: number;
+  dotColor?: string;
+  twinkleStrength?: number;
 }
 
 interface DotWithTwinkle {
@@ -74,12 +79,11 @@ const generateDots = (
     const circumference = radius * TWO_PI;
     const dotsForLat = circumference * dotDensity;
 
-    if (dotsForLat <= 0) continue; // Skip latitudes with no visible points
+    if (dotsForLat <= 0) continue;
 
     for (let x = 0; x < dotsForLat; x++) {
       const long = -180 + (x * 360) / dotsForLat;
 
-      // Early visibility check
       if (!visibilityForCoordinate(long, lat, mapLatLons)) continue;
 
       const [xPos, yPos, zPos] = calcPosFromLatLonRad(
@@ -88,12 +92,11 @@ const generateDots = (
         dotSphereRadius
       );
 
-      // Add twinkle parameters
       tempDots.push({
         position: new THREE.Vector3(xPos, yPos, zPos),
-        twinkleOffset: Math.random() * 10, // Random start time
-        twinkleDuration: 1 + Math.random(), // Variation in twinkle speed
-        twinkleIntensity: 0.5 + Math.random() * 0.5, // Variation in twinkle intensity
+        twinkleOffset: Math.random() * 10,
+        twinkleDuration: 1 + Math.random(),
+        twinkleIntensity: 0.5 + Math.random() * 0.5,
       });
     }
   }
@@ -101,9 +104,31 @@ const generateDots = (
   return tempDots;
 };
 
-const Dots = ({ dotSphereRadius, dotDensity = 2.5 }: DotsProps) => {
+const Dots = ({
+  dotSphereRadius,
+  dotDensity = GLOBE_DEFAULTS.dotDensity,
+  dotColor = GLOBE_DEFAULTS.dotColor,
+  twinkleStrength = GLOBE_DEFAULTS.twinkleStrength,
+}: DotsProps) => {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
-  const materialRef = useRef<THREE.ShaderMaterial>(null!);
+
+  const uniforms = useMemo(
+    () => ({
+      time: { value: 0.0 },
+      dotColor: { value: new THREE.Color(GLOBE_DEFAULTS.dotColor) },
+      twinkleStrength: { value: GLOBE_DEFAULTS.twinkleStrength as number },
+    }),
+    []
+  );
+
+  // Keep uniforms in sync with props without recreating the object
+  useEffect(() => {
+    uniforms.dotColor.value.set(dotColor);
+  }, [dotColor, uniforms]);
+
+  useEffect(() => {
+    uniforms.twinkleStrength.value = twinkleStrength;
+  }, [twinkleStrength, uniforms]);
 
   const [dots, setDots] = useState<DotWithTwinkle[]>([]);
 
@@ -111,20 +136,13 @@ const Dots = ({ dotSphereRadius, dotDensity = 2.5 }: DotsProps) => {
     try {
       const imageData = await loadImage("/world_alpha_mini.jpg");
       const mapLatLons = readMapImageData(imageData);
-      const generatedDots = generateDots(
-        dotSphereRadius,
-        dotDensity,
-        mapLatLons
-      );
-
+      const generatedDots = generateDots(dotSphereRadius, dotDensity, mapLatLons);
       setDots(generatedDots);
     } catch (error) {
       console.error("Failed to load image:", error);
-      return null;
     }
-  }, []);
+  }, [dotSphereRadius, dotDensity]);
 
-  // Use useEffect for image loading
   useEffect(() => {
     loadAndGenerateDots();
   }, [loadAndGenerateDots]);
@@ -140,7 +158,6 @@ const Dots = ({ dotSphereRadius, dotDensity = 2.5 }: DotsProps) => {
     }
   }, [dots]);
 
-  // Update instances with custom attributes
   useEffect(() => {
     if (meshRef.current && dots.length > 0) {
       const twinkleOffsets = new Float32Array(dots.length);
@@ -168,26 +185,17 @@ const Dots = ({ dotSphereRadius, dotDensity = 2.5 }: DotsProps) => {
     }
   }, [dots]);
 
-  // Animate time uniform
   useFrame((state) => {
-    if (materialRef.current) {
-      materialRef.current.uniforms.time.value = state.clock.elapsedTime;
-    }
+    uniforms.time.value = state.clock.elapsedTime;
   });
 
   return (
-    <instancedMesh
-      ref={meshRef}
-      args={[undefined, undefined, dots.length]} // Geometry, Material, Count
-    >
+    <instancedMesh ref={meshRef} args={[undefined, undefined, dots.length]}>
       <sphereGeometry args={[0.06, 4, 4]} />
       <shaderMaterial
-        ref={materialRef}
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
-        uniforms={{
-          time: { value: 0.0 },
-        }}
+        uniforms={uniforms}
         transparent={true}
       />
     </instancedMesh>

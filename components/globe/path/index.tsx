@@ -5,25 +5,24 @@ import { PathCurve } from "@/lib/utils/classes/path.class";
 import { TargetMarker } from "../target-marker";
 import { latLongToVector3 } from "@/lib/utils/map";
 import { AnimatedPath } from "@/lib/types";
+import { GLOBE_DEFAULTS } from "@/lib/config";
 
 interface PathProps extends AnimatedPath {
-  points: number[][]; // Array of [lat, lon] coordinates
+  points: number[][];
   smoothness?: number;
-  pathColor?: number;
-  pathWidth?: number;
 }
 
 const Path = ({
   points,
   radius = 20,
   smoothness = 0.3,
-  pathColor = 0x2196f3,
+  pathColor = GLOBE_DEFAULTS.pathColor,
   pathWidth = 0.03,
   revealDuration = 2500,
   hideDuration = 2500,
   pauseDuration = 500,
   markerSize = 0.2,
-  markerColor = 0x125291,
+  markerColor = GLOBE_DEFAULTS.markerColor,
   markerOffset = -0.1,
 }: PathProps) => {
   // Ref for tube geometry

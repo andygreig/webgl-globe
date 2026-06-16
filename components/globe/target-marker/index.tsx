@@ -1,11 +1,13 @@
 import * as THREE from "three";
 import { useMemo } from "react";
 
+import { GLOBE_DEFAULTS } from "@/lib/config";
+
 interface MarkerProps {
   position: THREE.Vector3;
   size?: number;
   offset?: number;
-  color?: number;
+  color?: string;
   visible?: boolean;
 }
 
@@ -13,7 +15,7 @@ const TargetMarker = ({
   position,
   size = 0.05,
   offset = 0.15,
-  color = 0x84b845,
+  color = GLOBE_DEFAULTS.markerColor,
   visible = true,
 }: MarkerProps) => {
   // Calculate quaternion for marker orientation

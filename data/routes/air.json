@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "type": "arc",
+    "label": "New York → Paris",
+    "path": [[40.7128, -74.006], [48.8566, 2.3522]],
+    "delay": 0,
+    "duration": 3500
+  },
+  {
+    "id": 2,
+    "type": "arc",
+    "label": "Los Angeles → New York",
+    "path": [[34.0522, -118.2437], [40.7128, -74.006]],
+    "delay": 3500,
+    "duration": 3000
+  },
+  {
+    "id": 3,
+    "type": "arc",
+    "label": "New York → Buenos Aires",
+    "path": [[40.7128, -74.006], [-34.603722, -58.381592]],
+    "delay": 8500,
+    "duration": 3000
+  },
+  {
+    "id": 4,
+    "type": "arc",
+    "label": "Paris → Lagos",
+    "path": [[48.8566, 2.3522], [6.5244, -3.379]],
+    "delay": 4000,
+    "duration": 2500
+  },
+  {
+    "id": 5,
+    "type": "arc",
+    "label": "Dubai → Mumbai",
+    "path": [[25.2048, 55.2708], [19.076, 72.8777]],
+    "delay": 6500,
+    "duration": 2000
+  },
+  {
+    "id": 6,
+    "type": "arc",
+    "label": "Tokyo → Los Angeles",
+    "path": [[35.6762, 139.6503], [34.0522, -118.2437]],
+    "delay": 8500,
+    "duration": 2000
+  },
+  {
+    "id": 7,
+    "type": "arc",
+    "label": "Los Angeles → Tokyo",
+    "path": [[34.0522, -118.2437], [35.6762, 139.6503]],
+    "delay": 1500,
+    "duration": 4000
+  },
+  {
+    "id": 8,
+    "type": "arc",
+    "label": "Lagos → Dubai",
+    "path": [[6.5244, -3.379], [25.2048, 55.2708]],
+    "delay": 10500,
+    "duration": 2500
+  },
+  {
+    "id": 9,
+    "type": "arc",
+    "label": "Shanghai → Tokyo",
+    "path": [[31.2304, 121.4737], [35.6762, 139.6503]],
+    "delay": 13000,
+    "duration": 1500
+  },
+  {
+    "id": 10,
+    "type": "arc",
+    "label": "Mumbai → Singapore",
+    "path": [[19.076, 72.8777], [1.3521, 103.8198]],
+    "delay": 14500,
+    "duration": 3500
+  },
+  {
+    "id": 101,
+    "type": "arc",
+    "label": "Melbourne → Hong Kong",
+    "path": [[-37.8409, 144.9464], [22.3027, 114.1772]],
+    "delay": 9500,
+    "duration": 3500
+  },
+  {
+    "id": 11,
+    "type": "arc",
+    "label": "Singapore → Shanghai",
+    "path": [[1.3521, 103.8198], [31.2304, 121.4737]],
+    "delay": 18000,
+    "duration": 2500
+  }
+]
