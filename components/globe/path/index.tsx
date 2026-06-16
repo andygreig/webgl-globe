@@ -35,18 +35,18 @@ const Path = ({
     "reveal" | "pause" | "hide"
   >("reveal");
 
-  const directedPoints = animationStage === "hide" ? points.reverse() : points;
+  const directedPoints = animationStage === "hide" ? [...points].reverse() : points;
 
-  const startPostition = points[0];
-  const endPostition = points[points.length - 1];
+  const startPosition = points[0];
+  const endPosition = points[points.length - 1];
   const startMarkerPosition = latLongToVector3(
-    startPostition[0],
-    startPostition[1],
+    startPosition[0],
+    startPosition[1],
     radius
   );
   const endMarkerPosition = latLongToVector3(
-    endPostition[0],
-    endPostition[1],
+    endPosition[0],
+    endPosition[1],
     radius
   );
 

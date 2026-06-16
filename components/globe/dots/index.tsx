@@ -109,21 +109,15 @@ const Dots = ({ dotSphereRadius, dotDensity = 2.5 }: DotsProps) => {
 
   const loadAndGenerateDots = useCallback(async () => {
     try {
-      //const imageData = await base64ToImageData(worldMapTexture);
       const imageData = await loadImage("/world_alpha_mini.jpg");
-      const mapLatLons = await readMapImageData(imageData);
+      const mapLatLons = readMapImageData(imageData);
       const generatedDots = generateDots(
         dotSphereRadius,
         dotDensity,
         mapLatLons
       );
 
-      // Only update state if the generated dots are different
-      setDots((prev) =>
-        JSON.stringify(prev) === JSON.stringify(generatedDots)
-          ? prev
-          : generatedDots
-      );
+      setDots(generatedDots);
     } catch (error) {
       console.error("Failed to load image:", error);
       return null;
@@ -179,9 +173,6 @@ const Dots = ({ dotSphereRadius, dotDensity = 2.5 }: DotsProps) => {
     if (materialRef.current) {
       materialRef.current.uniforms.time.value = state.clock.elapsedTime;
     }
-    /* if (meshRef) {
-      meshRef.current.rotation.y += delta * 0.12;
-    } */
   });
 
   return (

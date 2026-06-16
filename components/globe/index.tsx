@@ -7,7 +7,6 @@ import { GlobeRouteAnimation } from "@/lib/types";
 import { Dots } from "./dots";
 import { AnimationGroup } from "./animation-group";
 import { forwardRef } from "react";
-// import { DotsAlt } from "./dots-alt";
 
 interface GlobeProps {
   position: [x: number, y: number, z: number];

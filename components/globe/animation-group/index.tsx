@@ -10,42 +10,28 @@ interface AnimationGroupProps {
 }
 
 const AnimationGroup = ({ routes, sphereSize }: AnimationGroupProps) => {
-  // State to control animation sequence
   const [activeAnimations, setActiveAnimations] = useState<number[]>([]);
   const [animationStartTime, setAnimationStartTime] = useState<number>(0);
-  const animationCycleRef = useRef<number>(0);
+  const activeAnimationsRef = useRef<number[]>([]);
 
-  // Calculate total animation cycle duration
   const TOTAL_CYCLE_DURATION =
-    routes[routes.length - 1].delay + routes[routes.length - 1].duration + 1000; // Additional buffer time
+    routes[routes.length - 1].delay + routes[routes.length - 1].duration + 1000;
 
-  // Animation loop and sequencing
   useEffect(() => {
-    // Start the initial animation sequence
-    const startTime = Date.now();
-    setAnimationStartTime(startTime);
-
-    // Return cleanup function
-    return () => {
-      cancelAnimationFrame(animationCycleRef.current);
-    };
+    setAnimationStartTime(Date.now());
   }, []);
 
-  // Use useFrame for precise animation timing
   useFrame(() => {
-    // Calculate elapsed time since animation start
     const elapsedTime = Date.now() - animationStartTime;
 
-    // Reset or progress animation cycle
     if (elapsedTime >= TOTAL_CYCLE_DURATION) {
-      // Reset animation start time
       setAnimationStartTime(Date.now());
-      // Clear active animations
+      activeAnimationsRef.current = [];
       setActiveAnimations([]);
+      return;
     }
 
-    // Determine active animations based on elapsed time
-    const currentActiveAnimations = routes
+    const next = routes
       .filter(
         (route) =>
           elapsedTime >= route.delay &&
@@ -53,12 +39,13 @@ const AnimationGroup = ({ routes, sphereSize }: AnimationGroupProps) => {
       )
       .map((route) => route.id);
 
-    // Update active animations if changed
-    if (
-      JSON.stringify(currentActiveAnimations) !==
-      JSON.stringify(activeAnimations)
-    ) {
-      setActiveAnimations(currentActiveAnimations);
+    const prev = activeAnimationsRef.current;
+    const changed =
+      next.length !== prev.length || next.some((id, i) => id !== prev[i]);
+
+    if (changed) {
+      activeAnimationsRef.current = next;
+      setActiveAnimations(next);
     }
   });
 
