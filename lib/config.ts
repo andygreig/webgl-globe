@@ -10,4 +10,6 @@ export const GLOBE_DEFAULTS = {
   pathColor: '#2196f3',
   markerColor: '#125291',
   animationSpeed: 1,
+  ambientIntensity: Math.PI,
+  directionalIntensity: 0,
 } as const;

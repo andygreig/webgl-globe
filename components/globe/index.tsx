@@ -14,7 +14,7 @@ interface GlobeProps {
   routes: GlobeRouteAnimation[][];
   sphereSize?: number;
   dotDensity?: number;
-  tilt?: number;
+  rotation?: [number, number, number];
   sphereColor?: string;
   dotColor?: string;
   twinkleStrength?: number;
@@ -30,7 +30,7 @@ const Globe = forwardRef<Group, GlobeProps>(
       routes,
       sphereSize = GLOBE_DEFAULTS.sphereSize,
       dotDensity = GLOBE_DEFAULTS.dotDensity,
-      tilt = GLOBE_DEFAULTS.tilt,
+      rotation = [GLOBE_DEFAULTS.tilt, 0, 0],
       sphereColor = GLOBE_DEFAULTS.sphereColor,
       dotColor = GLOBE_DEFAULTS.dotColor,
       twinkleStrength = GLOBE_DEFAULTS.twinkleStrength,
@@ -41,7 +41,7 @@ const Globe = forwardRef<Group, GlobeProps>(
     ref
   ) => {
     return (
-      <group ref={ref} position={position} rotation={[tilt, 0, 0]}>
+      <group ref={ref} position={position} rotation={rotation}>
         <mesh>
           <sphereGeometry args={[sphereSize, 35, 35]} />
           <meshStandardMaterial

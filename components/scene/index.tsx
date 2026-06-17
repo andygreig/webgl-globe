@@ -74,6 +74,23 @@ const Scene = () => {
     }
   );
 
+  const { ambientIntensity, directionalIntensity } = useControls("Lighting", {
+    ambientIntensity: {
+      value: GLOBE_DEFAULTS.ambientIntensity,
+      min: 0,
+      max: 10,
+      step: 0.1,
+      label: "Ambient Intensity",
+    },
+    directionalIntensity: {
+      value: GLOBE_DEFAULTS.directionalIntensity,
+      min: 0,
+      max: 10,
+      step: 0.1,
+      label: "Directional Intensity",
+    },
+  });
+
   return (
     <div
       style={{ height: "100vh", width: "100vw" }}
@@ -100,6 +117,8 @@ const Scene = () => {
           arcColor={arcColor}
           pathColor={pathColor}
           animationSpeed={animationSpeed}
+          ambientIntensity={ambientIntensity}
+          directionalIntensity={directionalIntensity}
         />
       </Canvas>
     </div>

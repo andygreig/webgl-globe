@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Group } from "three";
 import { OrbitControls } from "@react-three/drei";
 import { Globe } from "../globe";
+import { SceneLights } from "../demos/scene-lights";
 import { GlobeRouteAnimation } from "@/lib/types";
 import { GLOBE_DEFAULTS } from "@/lib/config";
 
@@ -18,6 +19,8 @@ interface RotatingGlobeProps {
   arcColor?: string;
   pathColor?: string;
   animationSpeed?: number;
+  ambientIntensity?: number;
+  directionalIntensity?: number;
 }
 
 const RotatingGlobe = ({
@@ -32,6 +35,8 @@ const RotatingGlobe = ({
   arcColor = GLOBE_DEFAULTS.arcColor,
   pathColor = GLOBE_DEFAULTS.pathColor,
   animationSpeed = GLOBE_DEFAULTS.animationSpeed,
+  ambientIntensity = GLOBE_DEFAULTS.ambientIntensity,
+  directionalIntensity = GLOBE_DEFAULTS.directionalIntensity,
 }: RotatingGlobeProps) => {
   const globeRef = useRef<Group>(null);
 
@@ -47,7 +52,7 @@ const RotatingGlobe = ({
         ref={globeRef}
         position={[0, 0, 0]}
         routes={routes}
-        tilt={tilt}
+        rotation={[tilt, 0, 0]}
         sphereColor={sphereColor}
         dotDensity={dotDensity}
         dotColor={dotColor}
@@ -56,19 +61,7 @@ const RotatingGlobe = ({
         pathColor={pathColor}
         animationSpeed={animationSpeed}
       />
-      <ambientLight intensity={Math.PI} />
-      <hemisphereLight
-        color={0xffffbb}
-        groundColor={0x080820}
-        intensity={1.5}
-      />
-      <pointLight
-        position={[-50, 0, 60]}
-        decay={0}
-        intensity={Math.PI}
-        distance={100}
-        color={0x081b26}
-      />
+      <SceneLights ambientIntensity={ambientIntensity} directionalIntensity={directionalIntensity} />
       <OrbitControls enableDamping dampingFactor={0.1} rotateSpeed={0.5} />
     </>
   );
